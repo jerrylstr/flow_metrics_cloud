@@ -1,0 +1,38 @@
+modules:
+  jira:globalPage:
+    - key: fake-global-page
+      title: global page
+      description: a fake global page
+      thumbnail: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+      resource: main
+  jira:dashboardGadget:
+    - key: flow-metrics-cloud-hello-world-gadget
+      title: flow_metrics_cloud
+      description: A hello world flow dashboard gadget testing.
+      thumbnail: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+      resource: main
+      resolver:
+        function: resolver
+      edit:
+        resource: main
+    - key: flow-metrics-cloud-hello-world-gadget-2
+      title: flow_metrics_cloud_2
+      description: A hello world flow dashboard gadget.2 Blah Blah Bl
+      thumbnail: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+      resource: main
+      resolver:
+        function: resolver
+      edit:
+        resource: main
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: static/hello-world/build
+permissions:
+  content:
+    styles:
+      - unsafe-inline
+app:
+  id: ari:cloud:ecosystem::app/b5bb804d-5d3e-4e30-80dd-3483e9db6d77
