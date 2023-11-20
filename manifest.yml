@@ -34,5 +34,10 @@ permissions:
   content:
     styles:
       - unsafe-inline
+  scopes:
+    - storage:app
+    - read:jira-work
 app:
   id: ari:cloud:ecosystem::app/b5bb804d-5d3e-4e30-80dd-3483e9db6d77
+  runtime:
+    name: nodejs18.x

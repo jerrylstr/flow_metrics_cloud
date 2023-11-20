@@ -1,11 +1,106 @@
 import Resolver from '@forge/resolver';
+import api, { route, storage } from '@forge/api';
 
 const resolver = new Resolver();
 
-resolver.define('getText', (req) => {
-  console.log(req);
+const fetchFilters = async () => {
+  let startAt = 0;
+  const allFilters = [];
 
-  return 'Hello world!';
+  while (true) {
+    const response = await api.asUser().requestJira(route`/rest/api/3/filter/search?expand=jql&startAt=${startAt}`, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+    allFilters.push(...data.values);
+
+    if (data.isLast) {
+      break;
+    }
+
+    startAt += 50;
+  }
+
+  return allFilters;
+}
+
+const fetchFromJQL = async (jql) => {
+  let startAt = 0;
+  const allIssues = [];
+
+  while (true) {
+    var bodyData = `{
+      "expand": [
+        "names",
+        "schema",
+        "operations"
+      ],
+      "fields": [
+        "summary",
+        "status",
+        "assignee",
+        "issuetype"
+      ],
+      "fieldsByKeys": false,
+      "jql": "${jql.replace(/"/g, '\\"')}",
+      "maxResults": 100,
+      "startAt": ${startAt}
+    }`;
+
+    const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: bodyData
+    });
+
+    const data = await response.json();
+    allIssues.push(...data.issues);
+
+    console.log('loop number', startAt, allIssues.length)
+
+    if (startAt > allIssues.length) {
+      break;
+    }
+
+    startAt += 100;
+  }
+
+  return allIssues;
+}
+
+resolver.define('fetchStorage', async (req) => {
+  const storageData = await storage.get(`SELECTED_FILTER`);
+  return storageData;
+})
+
+resolver.define('setStorage', async (req) => {
+  console.log(req)
+  await storage.set(`SELECTED_FILTER`, req);
+  return req;
+})
+
+resolver.define('fetchIssuesFromJql', async (req) => {
+  const statsData = await fetchFromJQL(req.context.extension.gadgetConfiguration.filter.jql);
+  return statsData.issues;
+})
+
+
+resolver.define('getFilters', async (req) => {
+  // console.log(req);
+
+  const filters = await fetchFilters();
+
+  const mappedFilters = filters.map(item => ({value: item.id, label: item.name, jql: item.jql}));
+  
+  // console.log(filters)
+  // console.log(mappedFilters)
+  return mappedFilters;
 });
 
 export const handler = resolver.getDefinitions();
