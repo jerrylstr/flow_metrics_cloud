@@ -16,10 +16,10 @@ modules:
       edit:
         resource: main
     - key: flow-metrics-cloud-hello-world-gadget-2
-      title: flow_metrics_cloud_2
+      title: Flow Distribution Chart
       description: A hello distribution flow dashboard gadget.2 Blah Blah Bl
       thumbnail: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
-      resource: main
+      resource: distribution
       resolver:
         function: resolver
       edit:
