@@ -27,6 +27,56 @@ const fetchFilters = async () => {
   return allFilters;
 }
 
+
+async function getIssuesByJQL(jqlExpression) {
+  let startAt = 0;
+  const allIssues = [];
+  while (true) {
+  try {
+    const requestBody = {
+      context: {
+        issues: {
+          jql: {
+            query: jqlExpression,
+            startAt: startAt, // Start at the first issue
+            maxResults: 1000, // Maximum number of issues to retrieve
+            validation: 'strict'
+          }
+        }
+      },
+      expression: "issues"
+    };
+
+    const response = await api.asUser().requestJira(route`/rest/api/3/expression/eval`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      allIssues.push(...data.value);
+      
+      if (startAt > allIssues.length) {
+        break;
+      }
+  
+      startAt += 1000;
+    } else {
+      throw new Error(`Failed to fetch issues: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+    return allIssues;
+}
+}
+
+
+
 const fetchFromJQL = async (jql) => {
   let startAt = 0;
   const allIssues = [];
@@ -86,7 +136,7 @@ resolver.define('setStorage', async (req) => {
 })
 
 resolver.define('fetchIssuesFromJql', async (req) => {
-  const statsData = await fetchFromJQL(req.context.extension.gadgetConfiguration.filter.jql);
+  const statsData = await getIssuesByJQL(req.context.extension.gadgetConfiguration.filter.jql);
   return statsData;
 })
 
