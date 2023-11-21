@@ -87,7 +87,7 @@ resolver.define('setStorage', async (req) => {
 
 resolver.define('fetchIssuesFromJql', async (req) => {
   const statsData = await fetchFromJQL(req.context.extension.gadgetConfiguration.filter.jql);
-  return statsData.issues;
+  return statsData;
 })
 
 
