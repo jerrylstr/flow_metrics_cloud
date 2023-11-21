@@ -17,19 +17,21 @@ modules:
         resource: main
     - key: flow-metrics-cloud-hello-world-gadget-2
       title: flow_metrics_cloud_2
-      description: A hello world flow dashboard gadget.2 Blah Blah Bl
+      description: A hello distribution flow dashboard gadget.2 Blah Blah Bl
       thumbnail: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
       resource: main
       resolver:
         function: resolver
       edit:
-        resource: main
+        resource: distribution
   function:
     - key: resolver
       handler: index.handler
 resources:
   - key: main
     path: static/hello-world/build
+  - key: distribution
+    path: static/flow-distribution/build
 permissions:
   content:
     styles:
